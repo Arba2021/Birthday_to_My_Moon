@@ -1,0 +1,116 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    /* Changed to light to match the pink/white theme */
+    color-scheme: light; 
+  }
+
+  html {
+    scroll-behavior: smooth;
+    height: 100%;
+  }
+
+  /* Accessibility */
+  @media (prefers-reduced-motion: reduce) {
+    html {
+      scroll-behavior: auto;
+    }
+    * {
+      animation-duration: 0.001ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.001ms !important;
+    }
+  }
+
+  body {
+    /* THEME: Deep Red -> Pink -> Soft White */
+    @apply bg-night text-white font-sans antialiased selection:bg-white/30 selection:text-white;
+    
+    /* The New Background Gradient */
+    background-image: linear-gradient(180deg, #9f1239 0%, #ec4899 50%, #fff1f2 100%);
+    background-attachment: fixed;
+    min-height: 100vh;
+  }
+
+  /* Performance fix for mobile */
+  @supports (-webkit-touch-callout: none) {
+    body {
+      background-attachment: scroll;
+    }
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-serif tracking-tight;
+  }
+
+  /* --- NEW ROMANTIC SCROLLBAR (White & Pink) --- */
+  ::-webkit-scrollbar {
+    width: 6px;
+  }
+
+  ::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    /* Gradient from Pink to White */
+    background: linear-gradient(to bottom, #be185d, #ffffff);
+    border-radius: 10px;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    background: linear-gradient(to bottom, #9d174d, #ffffff);
+  }
+}
+
+@layer components {
+  /* Updated Glass Effect for Red/Pink Background */
+  .glass {
+    /* Using white transparency (light mode glass) instead of dark */
+    @apply bg-white/10 backdrop-blur-md border border-white/20 shadow-lg;
+  }
+
+  .glass-hover {
+    @apply hover:bg-white/20 hover:border-white/40 transition-all duration-300;
+  }
+
+  /* Updated Glows */
+  .text-glow-pink {
+    text-shadow: 0 0 15px rgba(255, 255, 255, 0.6);
+  }
+
+  .text-glow-purple {
+    text-shadow: 0 0 15px rgba(255, 0, 80, 0.5); /* Changed to Red Glow */
+  }
+}
+
+@layer utilities {
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none;
+  }
+  
+  .scrollbar-hide {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+
+  /* --- 3D Animation Utilities (KEPT AS IS) --- */
+  .perspective-1000 {
+    perspective: 1000px;
+  }
+  
+  .rotate-y-180 {
+    transform: rotateY(180deg);
+  }
+
+  .transform-style-3d {
+    transform-style: preserve-3d;
+  }
+  
+  .backface-hidden {
+    backface-visibility: hidden;
+  }
+}
