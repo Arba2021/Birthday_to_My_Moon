@@ -1,57 +1,51 @@
 import { useState, useEffect, useRef } from 'react';
 
-// ✅ UPDATED: Added 'autoPlay' parameter (defaults to false)
-export const useAudio = (url: string, defaultVolume: number = 0.3, autoPlay: boolean = false) => {
-  // ✅ Initialize state based on autoPlay preference
-  const [playing, setPlaying] = useState(autoPlay);
+export const useAudio = (path: string) => {
   const audioRef = useRef<HTMLAudioElement | null>(null);
+  const [playing, setPlaying] = useState(false);
 
   useEffect(() => {
-    const audio = new Audio(url);
-    audio.loop = true;
-    audio.volume = defaultVolume;
-    audioRef.current = audio;
+    // 1. Get the base URL (e.g., "/Birthday_to_My_Moon/")
+    const basePath = import.meta.env.BASE_URL;
+    
+    // 2. Clean up the path inputs to avoid double slashes
+    const cleanPath = path.startsWith('/') ? path.slice(1) : path;
+    const cleanBase = basePath.endsWith('/') ? basePath : `${basePath}/`;
 
-    // If autoPlay is on, try to play immediately
-    if (autoPlay) {
-      const playPromise = audio.play();
+    // 3. Create the full URL
+    const fullPath = `${cleanBase}${cleanPath}`;
+
+    console.log("🎵 Attempting to play music from:", fullPath); 
+
+    audioRef.current = new Audio(fullPath);
+    audioRef.current.loop = true; 
+    audioRef.current.volume = 0.5;
+
+    return () => {
+      if (audioRef.current) {
+        audioRef.current.pause();
+        audioRef.current = null;
+      }
+    };
+  }, [path]);
+
+  const toggle = () => {
+    if (!audioRef.current) return;
+
+    if (playing) {
+      audioRef.current.pause();
+    } else {
+      const playPromise = audioRef.current.play();
       if (playPromise !== undefined) {
         playPromise.catch((error) => {
-          console.log("Autoplay prevented by browser:", error);
-          setPlaying(false); // Fallback if browser blocks it
+          console.error("Playback failed (User interaction needed):", error);
         });
       }
     }
-
-    const handleEnded = () => setPlaying(false);
-    audio.addEventListener('ended', handleEnded);
-
-    return () => {
-      audio.removeEventListener('ended', handleEnded);
-      audio.pause();
-      audioRef.current = null;
-    };
-  }, [url, defaultVolume, autoPlay]);
-
-  useEffect(() => {
-    if (!audioRef.current) return;
-    
-    // Skip this effect on mount if we already handled autoplay in the first effect
-    // But for toggling later, we need this.
-    if (playing) {
-      // Only call play if it's paused to avoid errors
-      if (audioRef.current.paused) {
-        const playPromise = audioRef.current.play();
-        if (playPromise !== undefined) {
-          playPromise.catch(() => setPlaying(false));
-        }
-      }
-    } else {
-      audioRef.current.pause();
-    }
-  }, [playing]);
-
-  const toggle = () => setPlaying(!playing);
+    setPlaying(!playing);
+  };
 
   return { playing, toggle };
 };
+
+export default useAudio;
